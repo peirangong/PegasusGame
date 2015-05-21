@@ -1,15 +1,16 @@
-package gameElements;
+package Character;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-import android.util.Log;
+import Character.Weapon.SpecialWeapon;
 
 public class BaseCharacter {
 
 	// TODO: documentation of variables
 	private static final boolean DEBUG = true;
-    private static final String TAG = "PegasusGame";
+
 	protected int totalArmor;
 	protected int armorWorn;
 	protected int level;
@@ -21,9 +22,7 @@ public class BaseCharacter {
 	protected int defendPwr;
 
 	protected List<Skill> skills;
-	protected List<Weapon> weapons;
-
-	public String fightLog = "";
+	protected LinkedList<Weapon> weapons;
 
 	public static final int NOVICE = 1;
 	public static final int MEDIUM = 2;
@@ -40,13 +39,12 @@ public class BaseCharacter {
 		defendPwr = 0;
 
 		skills = new ArrayList<Skill>();
-		weapons = new ArrayList<Weapon>();
-		fightLog = "";
+		weapons = new LinkedList<Weapon>();
 	}
 
 	public String getStatus() {
-		String s = "Armors Worn: " + armorWorn + ", Armors Left: " + totalArmor
-				+ ", Energy: " + energy;
+		String s = name + " - Armors Worn: " + armorWorn + ", Armors Left: "
+				+ totalArmor + ", Energy: " + energy;
 		return s;
 	}
 
@@ -54,99 +52,103 @@ public class BaseCharacter {
 		return (armorWorn >= 0);
 	}
 
-	@Override
-    public String toString() {
+	public String toString() {
 		return name + " Armor: " + totalArmor + " Level: " + level;
 	}
 
 	public Move gather() {
-		Move move = new Move(this, Move.GATHER);
 
 		attackPwr = 0;
 		defendPwr = 0;
 		energy = energy + 2;
+		Move move = new Move(this, Move.GATHER, attackPwr, defendPwr);
 		if (DEBUG) {
-			Log.d(TAG, name + " gathers!");
+			System.out.println(name + " gathers!");
 		}
-		fightLog += name + " gathers!" + "\n";
 
 		return move;
 	}
 
 	public Move defense() {
-		Move move = new Move(this, Move.DEFENSE);
-
 		attackPwr = 0;
 		defendPwr = 10;
+		Move move = new Move(this, Move.DEFENSE, attackPwr, defendPwr);
 		if (DEBUG) {
-			Log.d(TAG, name + " defends!");
+			System.out.println(name + " defends!");
 		}
-		fightLog += name + " defends!" + "\n";
 
 		return move;
 	}
 
 	public Move wearArmor() {
-		Move move = new Move(this, Move.ARMOR);
-
+		Move move;
 		attackPwr = 0;
 		defendPwr = 10;
+
 		if (totalArmor > 0) {
 			if (!weaponReady) {
 				weaponReady = true;
 			}
 			armorWorn++;
 			totalArmor--;
+			move = new Move(this, Move.ARMOR, attackPwr, defendPwr);
 
 			if (DEBUG) {
-				Log.d(TAG, name + " wears one piece of armor!");
+				System.out.println(name + " wears one piece of armor!");
 			}
-			fightLog += name + " wears one piece of armor!" + "\n";
 
 		} else {
+			move = new Move(this, Move.ARMOR, attackPwr, defendPwr);
+
 			if (DEBUG) {
-				Log.d(TAG, "No more armor! " + name + " defends!");
+				System.out.println("No more armor! " + name + " defends!");
 			}
-			fightLog += "No more armor! " + name + " defends!" + "\n";
 		}
 
 		return move;
-
 	}
 
-	public Move attack(Skill s) {
-		Move move = new Move(this, s);
+	public Skill attack(Skill s) {
+		Skill move;
 
 		if (energy < s.getCost()) {
-			Log.d(TAG, "Not enough energy!");
+			System.out.println("Not enough energy!");
 			attackPwr = 0;
 			defendPwr = 10;
+			move = new Skill(this, Move.DEFENSE, attackPwr, defendPwr, 0);
 		} else {
 			energy = energy - s.getCost();
 			attackPwr = s.getAtt();
 			defendPwr = s.getDef();
+			move = new Skill(this, s.getName(), attackPwr, defendPwr,
+					s.getCost());
+			if (DEBUG) {
+				System.out.println("Attack! " + s.getName());
+			}
 		}
-
-		if (DEBUG) {
-			Log.d(TAG, "Attack! " + s.getName());
-		}
-        fightLog += "Attack! " + s.getName() + "\n";
 
 		return move;
 
 	}
 
-	public Move attack(Weapon w) {
-		Move move = new Move(this, w);
-
+	public Weapon attack(LinkedList<Weapon> weaponList, int loc) {
+		Weapon w = weaponList.get(loc);
+		Weapon move;
 		if (!weaponReady) {
-			Log.d(TAG, "Weapon not ready!");
-	        fightLog += "Weapon not ready!" + "\n";
+			System.out.println("Weapon is not ready!");
 			attackPwr = 0;
 			defendPwr = 10;
+			move = new Weapon(this, Move.DEFENSE, attackPwr, defendPwr,
+					SpecialWeapon.Regular);
 		} else {
 			attackPwr = w.getAtt();
 			defendPwr = w.getDef();
+			if (DEBUG) {
+				System.out.println("Attack! " + w.getName());
+			}
+			weaponList.remove(loc);
+			move = new Weapon(this, w.getName(), attackPwr, defendPwr,
+					w.getSpecial());
 		}
 
 		return move;
@@ -161,18 +163,16 @@ public class BaseCharacter {
 		}
 
 		if (DEBUG) {
-		    String skills = "";
 			if (s.size() > 0) {
 				System.out.print("Available skills: ");
 				for (int i = 0; i < s.size() - 1; i++) {
-				    skills += s.get(i).getName() + ", ";
+					System.out.print(s.get(i).getName() + ", ");
 				}
-				skills += s.get(s.size() - 1).getName();
+				System.out.print(s.get(s.size() - 1).getName());
 			} else {
-				skills += "No available skills";
+				System.out.print("No available skills");
 			}
-			Log.d(TAG, skills);
-			Log.d(TAG, "\n");
+			System.out.println();
 		}
 
 		return s;
@@ -189,9 +189,8 @@ public class BaseCharacter {
 	public void lossArmor(int loss) {
 		armorWorn = armorWorn - loss;
 		if (DEBUG) {
-			Log.d(TAG, this.name + " loses " + loss + " armors!");
+			System.out.println(this.name + " loses " + loss + " armors!");
 		}
-        fightLog += this.name + " loses " + loss + " armors!" + "\n";
 	}
 
 	public String getName() {
@@ -202,7 +201,31 @@ public class BaseCharacter {
 		return energy;
 	}
 
-	public void clearLog() {
-	    fightLog = "";
+	public LinkedList<Weapon> getWeapons() {
+		if (!weaponReady) {
+			return new LinkedList<Weapon>();
+		}
+		return weapons;
+	}
+
+	public void increaseWeapon(Weapon w) {
+		weapons.add(w);
+		if (DEBUG) {
+			System.out.println(this.name + " captures " + w.getName());
+		}
+	}
+
+	public void increaseEnergy() {
+		energy = energy + 2;
+		if (DEBUG) {
+			System.out.println(this.name + " captures energy!");
+		}
+	}
+
+	public void increaseArmor() {
+		totalArmor++;
+		if (DEBUG) {
+			System.out.println(this.name + " captures armor!");
+		}
 	}
 }

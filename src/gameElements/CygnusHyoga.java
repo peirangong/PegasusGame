@@ -1,8 +1,11 @@
-package gameElements;
+package Character;
+
+import Character.Weapon.SpecialWeapon;
 
 public class CygnusHyoga extends BaseCharacter {
 
-	private Weapon w = new Weapon("Ice ring", 0, 10, true);
+	private Weapon w = new Weapon(this, "Ice ring", 0, 10,
+			SpecialWeapon.Ice_Ring);
 
 	public CygnusHyoga() {
 		super();
@@ -11,13 +14,15 @@ public class CygnusHyoga extends BaseCharacter {
 		level = NOVICE;
 		name = "Cygnus Hyoga";
 
-		// TODO: skill name
-		skills.add(new Skill("Diamond Microdust", 1, 1, 1));
-		skills.add(new Skill("Diamond Stardust", 2, 2, 2));
-		skills.add(new Skill("Absolute Zero", 4, 4, 4));
-		skills.add(new Skill("Cosmo Explosion", 10, 10, 10));
-		skills.add(new Skill("Aurora Sword", 12, 12, 12));
-		skills.add(new Skill("Aurora Thunder", 16, 16, 16));
-		skills.add(new Skill("Aurora Execution", 24, 24, 24));
+		skills.add(new Skill(this, "Diamond Microdust", 1, 1, 1));
+		skills.add(new Skill(this, "Diamond Stardust", 2, 2, 2));
+		skills.add(new Skill(this, "Absolute Zero", 4, 4, 4));
+		skills.add(new Skill(this, "Cosmo Explosion", 10, 10, 10));
+		skills.add(new Skill(this, "Aurora Sword", 12, 12, 12));
+		skills.add(new Skill(this, "Aurora Thunder", 16, 16, 16));
+		skills.add(new Skill(this, "Aurora Execution", 24, 24, 24));
+
+		weapons.add(w);
+		weapons.add(w);
 	}
 }

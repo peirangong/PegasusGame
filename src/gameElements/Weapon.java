@@ -1,28 +1,20 @@
-package gameElements;
+package Character;
 
 /** The weapon(s) that came from the armor. */
-public class Weapon {
-	private String name;
-	private int att;
-	private int def;
-	private boolean special;
+public class Weapon extends Move {
 
-	public Weapon(String n, int a, int d, boolean s) {
-		name = n;
-		att = a;
-		def = d;
+	public enum SpecialWeapon {
+		Regular, Ice_Ring;
+	}
+
+	private SpecialWeapon special;
+
+	public Weapon(BaseCharacter ch, String n, int a, int d, SpecialWeapon s) {
+		super(ch, n, a, d);
 		special = s;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public int getAtt() {
-		return att;
-	}
-
-	public int getDef() {
-		return def;
+	public SpecialWeapon getSpecial() {
+		return special;
 	}
 }
